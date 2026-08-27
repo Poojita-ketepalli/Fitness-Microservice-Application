@@ -1,0 +1,41 @@
+server:
+  port: 8180
+
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      server:
+        webflux:
+          routes:
+            - id: user-service
+              uri: lb://user-service
+              predicates:
+                - Path=/api/users/**
+
+            - id: activity-service
+              uri: lb://activity-service
+              predicates:
+                - Path=/api/activities/**
+
+            - id: ai-service
+              uri: lb://ai-service
+              predicates:
+                - Path=/api/recommendations/**
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    hostname: localhost
+    prefer-ip-address: true
+    instance-id: localhost:${spring.application.name}:${server.port}
+
+logging:
+  level:
+    org.springframework.cloud.gateway: TRACE
+    org.springframework.web.reactive.function.client: TRACE
+    reactor.netty.http.client: TRACE
+
